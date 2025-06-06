@@ -3,7 +3,7 @@ package query
 import (
 	"context"
 	"fmt"
-	"gw-exchanger/domain/models"
+
 	"gw-exchanger/domain/repository"
 )
 
@@ -15,15 +15,21 @@ func NewRepository(client repository.Client) *UserRepository {
 	return &UserRepository{client: client}
 }
 
-func (r *UserRepository) GettingCourse(ctx context.Context) (*models.Сourse, error) {
-	var сourse models.Сourse
+func (r *UserRepository) GettingCourse(ctx context.Context) (map[string]float64, error) {
+	courses := make(map[string]float64)
+	var usdRub, usdEur, eurRub float64
+
 	err := r.client.QueryRow(ctx, `SELECT * FROM exchanger `).Scan(
-		&сourse.USD, &сourse.RUB, &сourse.EUR)
+		&usdRub, &usdEur, &eurRub)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get сourse: %w", err)
 	}
 
-	return &сourse, nil
+	courses["USD_RUB"] = usdRub / 10000
+	courses["USD_EUR"] = usdEur / 10000
+	courses["EUR_RUB"] = eurRub / 10000
+
+	return courses, nil
 }
 
 func (r *UserRepository) Exchange(ctx context.Context, fromCurrency, toCurrency string) (int, error) {

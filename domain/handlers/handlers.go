@@ -2,26 +2,46 @@ package handlers
 
 import (
 	"context"
-	"gw-exchanger/domain/models"
+	pb "github.com/Serjeri/proto-exchange/exchange"
+	"google.golang.org/grpc"
 )
 
+type serverAPI struct {
+	pb.UnimplementedExchangeServiceServer
+	user UserService
+}
+
 type UserService interface {
-	GetExchange(ctx context.Context) (*models.Сourse, error)
-	GetRate(ctx context.Context, fromCurrency, toCurrency string, amount int) (int, error)
+	GetExchange(ctx context.Context) (map[string]float64, error)
+	GetRate(ctx context.Context, fromCurrency, toCurrency string, amount int) (float64, error)
 }
 
-func HandlerGetExchange(s UserService) {
-
+func Register(gRPCServer *grpc.Server, user UserService) {
+	pb.RegisterExchangeServiceServer(gRPCServer, &serverAPI{user: user})
 }
 
-func HandlerGetExchangeRateForCurrency(s UserService) (float64, error) {
-	var fromCurrency, toCurrency string
-	var amount int
-	
-	rate, err := s.GetRate(context.Background(), fromCurrency, toCurrency, amount)
+func (s *serverAPI) GetExchangeRates(ctx context.Context, in *pb.Empty) (*pb.ExchangeRatesResponse, error) {
+	rates, err := s.user.GetExchange(ctx)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
-	return float64(rate) / 10000, nil
+	return &pb.ExchangeRatesResponse{Rates: rates}, nil
+}
+
+func (s *serverAPI) PerformExchange(ctx context.Context, in *pb.ExchangeRequest) (*pb.ExchangeResponse, error) {
+	rate, err := s.user.GetRate(ctx, in.FromCurrency, in.ToCurrency, int(in.Amount))
+	if err != nil {
+		return nil, err
+	}
+
+	newBalance := make(map[string]float64)
+	newBalance[in.FromCurrency] = 0.00
+	newBalance[in.ToCurrency] = rate
+
+	return &pb.ExchangeResponse{
+		Message:         "Exchange successful",
+		ExchangedAmount: 0.0,
+		NewBalance:      newBalance,
+	}, nil
 }

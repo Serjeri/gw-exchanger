@@ -18,7 +18,7 @@ type Client interface {
 
 func Connect() (*pgx.Conn, error) {
 
-	err := godotenv.Load("../domain/config/.env")
+	err := godotenv.Load("./domain/config/.env")
 	if err != nil {
 		return nil, fmt.Errorf("failed to load .env file: %w", err)
 	}
