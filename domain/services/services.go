@@ -21,12 +21,13 @@ func (s *UserService) GetExchange(ctx context.Context) (map[string]float64, erro
 	return s.repo.GettingCourse(ctx)
 }
 
-func (s *UserService) GetRate(ctx context.Context, fromCurrency, toCurrency string, amount int) (float32, error) {
+func (s *UserService) GetRate(ctx context.Context, fromCurrency, toCurrency string, amount int) (float64, error) {
 	rate, err := s.repo.Exchange(ctx, fromCurrency, toCurrency)
 	if err != nil {
 		return 0, err
 	}
-	result := (rate * amount) / 1000000
 
-	return float32(result), nil
+	result := (float64(amount) / 100) * float64(rate) / 1000000
+
+	return float64(result), nil
 }
