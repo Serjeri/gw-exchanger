@@ -19,7 +19,7 @@ func (r *UserRepository) GettingCourse(ctx context.Context) (map[string]float64,
 	courses := make(map[string]float64)
 	var usdRub, usdEur, eurRub float64
 
-	err := r.client.QueryRow(ctx, `SELECT * FROM exchanger `).Scan(
+	err := r.client.QueryRow(ctx, `SELECT usd, rub, eur FROM exchanger `).Scan(
 		&usdRub, &usdEur, &eurRub)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get сourse: %w", err)

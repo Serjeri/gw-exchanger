@@ -13,7 +13,7 @@ type serverAPI struct {
 
 type UserService interface {
 	GetExchange(ctx context.Context) (map[string]float64, error)
-	GetRate(ctx context.Context, fromCurrency, toCurrency string, amount int) (float64, error)
+	GetRate(ctx context.Context, fromCurrency, toCurrency string, amount int) (float32, error)
 }
 
 func Register(gRPCServer *grpc.Server, user UserService) {
@@ -37,7 +37,7 @@ func (s *serverAPI) PerformExchange(ctx context.Context, in *pb.ExchangeRequest)
 
 	newBalance := make(map[string]float64)
 	newBalance[in.FromCurrency] = 0.00
-	newBalance[in.ToCurrency] = rate
+	newBalance[in.ToCurrency] = float64(rate)
 
 	return &pb.ExchangeResponse{
 		Message:         "Exchange successful",
