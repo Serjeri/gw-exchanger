@@ -1,0 +1,16 @@
+services:
+  app2:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ../config:/config
+    ports:
+      - "5002:50051"
+    restart: unless-stopped
+    networks:
+      - network
+
+networks:
+  network:
+    external: true
