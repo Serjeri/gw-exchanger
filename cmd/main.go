@@ -2,6 +2,7 @@ package main
 
 import (
 	"gw-exchanger/domain/app"
+	"gw-exchanger/domain/config"
 	"os"
 	"os/signal"
 	"syscall"
@@ -10,9 +11,11 @@ import (
 )
 
 func main() {
+	cfg := config.MustLoad()
+
 	log.Info("start application")
 
-	application := app.New(50051)
+	application := app.New(cfg.Addressgrpc, cfg.Dburl)
 
 	go func() {
 		application.GRPCServer.MustRun()

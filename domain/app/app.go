@@ -12,8 +12,8 @@ type App struct {
 	GRPCServer *grpcapp.App
 }
 
-func New(grpcPort int) *App {
-	conn, err := repository.Connect()
+func New(grpcPort int, db string) *App {
+	conn, err := repository.Connect(db)
 	if err != nil {
 		log.Fatalf("Ошибка подключения к БД: %v", err)
 	}
