@@ -28,8 +28,5 @@ COPY --from=build /app/app /usr/local/bin/app
 # Копируем файл конфигурации (если нужно)
 COPY config/config.yml /config/config.yml
 
-# Порт, на котором будет слушать ваше приложение
-EXPOSE 50051
-
 # Команда для запуска приложения
 CMD ["/usr/local/bin/app"]
