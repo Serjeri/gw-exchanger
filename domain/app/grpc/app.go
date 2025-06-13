@@ -13,10 +13,10 @@ import (
 
 type App struct {
 	gRPCServer *grpc.Server
-	port       int
+	port       string
 }
 
-func New(authService authgrpc.UserService, port int) *App{
+func New(authService authgrpc.UserService, port string) *App{
 
 	grpcServer := grpc.NewServer()
 
@@ -37,7 +37,7 @@ func (a *App) MustRun() {
 func (a *App) Run() error {
 	const op = "grpcapp.Run"
 
-	l, err := net.Listen("tcp", fmt.Sprintf(":%d", a.port))
+	l, err := net.Listen("tcp", a.port)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
@@ -54,7 +54,7 @@ func (a *App) Run() error {
 func (a *App) Stop() {
 	const op = "grpcapp.Stop"
 
-	log.Info(slog.String("op", op), "stopping gRPC server", slog.Int("port", a.port))
+	log.Info(slog.String("op", op), "stopping gRPC server", slog.String("port", a.port))
 
 	a.gRPCServer.GracefulStop()
 }

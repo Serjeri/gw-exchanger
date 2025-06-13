@@ -2,8 +2,6 @@ package services
 
 import (
 	"context"
-
-	"github.com/gofiber/fiber/v2/log"
 )
 
 type UserRepository interface {
@@ -30,6 +28,6 @@ func (s *UserService) GetRate(ctx context.Context, fromCurrency, toCurrency stri
 	}
 
 	result := (float64(amount) / 100) * float64(rate) / 1000000
-	log.Info(123)
+
 	return float64(result), nil
 }

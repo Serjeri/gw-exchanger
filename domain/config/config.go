@@ -16,7 +16,7 @@ type Database struct {
 }
 
 type HTTPServer struct {
-	Addressgrpc int `yaml:"addressgrpc" env-default:"localhost:50051"`
+	Addressgrpc string `yaml:"addressgrpc"`
 }
 
 func MustLoad() *Config {
