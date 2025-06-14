@@ -5,23 +5,23 @@ import (
 	"gw-exchanger/domain/repository"
 	"gw-exchanger/domain/repository/query"
 	"gw-exchanger/domain/services"
-	"log"
+	"log/slog"
 )
 
 type App struct {
 	GRPCServer *grpcapp.App
 }
 
-func New(grpcPort string, db string) *App {
+func New(log *slog.Logger, grpcPort string, db string) *App {
 	conn, err := repository.Connect(db)
 	if err != nil {
-		log.Fatalf("Ошибка подключения к БД: %v", err)
+		panic(err)
 	}
 
 	repo := query.NewRepository(conn)
-	userService := services.NewUserService(repo)
+	userService := services.NewUserService(log ,repo)
 
-	grpcApp := grpcapp.New(userService, grpcPort)
+	grpcApp := grpcapp.New(log, userService, grpcPort)
 
 	return &App{
 		GRPCServer: grpcApp,

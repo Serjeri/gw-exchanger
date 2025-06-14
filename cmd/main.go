@@ -7,15 +7,18 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gofiber/fiber/v2/log"
+	"log/slog"
 )
+
 
 func main() {
 	cfg := config.MustLoad()
 
+	log := setupLogger()
+
 	log.Info("start application")
 
-	application := app.New(cfg.Addressgrpc, cfg.Dburl)
+	application := app.New(log,cfg.Addressgrpc, cfg.Dburl)
 
 	go func() {
 		application.GRPCServer.MustRun()
@@ -28,4 +31,13 @@ func main() {
 
 	application.GRPCServer.Stop()
 	log.Info("Gracefully stopped")
+}
+
+func setupLogger() *slog.Logger {
+	var log *slog.Logger
+
+	log = slog.New(
+		slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}),)
+
+	return log
 }

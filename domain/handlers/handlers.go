@@ -2,8 +2,11 @@ package handlers
 
 import (
 	"context"
+
 	pb "github.com/Serjeri/proto-exchange/exchange"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type serverAPI struct {
@@ -23,7 +26,7 @@ func Register(gRPCServer *grpc.Server, user UserService) {
 func (s *serverAPI) GetExchangeRates(ctx context.Context, in *pb.Empty) (*pb.ExchangeRatesResponse, error) {
 	rates, err := s.user.GetExchange(ctx)
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, "failed get exchange rates")
 	}
 
 	return &pb.ExchangeRatesResponse{Rates: rates}, nil
@@ -32,7 +35,7 @@ func (s *serverAPI) GetExchangeRates(ctx context.Context, in *pb.Empty) (*pb.Exc
 func (s *serverAPI) PerformExchange(ctx context.Context, in *pb.ExchangeRequest) (*pb.ExchangeResponse, error) {
 	rate, err := s.user.GetRate(ctx, in.FromCurrency, in.ToCurrency, int(in.Amount))
 	if err != nil {
-		return nil, err
+		return nil, status.Error(codes.Internal, "failed get perform exchange ")
 	}
 
 	newBalance := make(map[string]float64)
